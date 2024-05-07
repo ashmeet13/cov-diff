@@ -89,3 +89,33 @@ func Union(a []Interval, b []Interval) []Interval {
 
 	return joinSortedIntervals(result)
 }
+
+// Subtract two intervals, assuming `a` and `b` may overlap
+func subtractInterval(a, b Interval) []Interval {
+	if a.End < b.Start || a.Start > b.End {
+		return []Interval{a} // No overlap
+	}
+	var result []Interval
+	if a.Start < b.Start {
+		result = append(result, Interval{Start: a.Start, End: b.Start - 1})
+	}
+	if a.End > b.End {
+		result = append(result, Interval{Start: b.End + 1, End: a.End})
+	}
+	return result
+}
+
+// Subtract cover intervals from diff intervals
+func SubtractIntervals(diff, cover []Interval) []Interval {
+	cover = JoinAndSortIntervals(cover) // Merge cover intervals
+
+	result := diff
+	for _, c := range cover {
+		temp := []Interval{}
+		for _, d := range result {
+			temp = append(temp, subtractInterval(d, c)...)
+		}
+		result = temp
+	}
+	return result
+}
