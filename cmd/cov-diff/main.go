@@ -92,6 +92,11 @@ func main() {
 	// de-allocate diffBytes
 	diffBytes = nil
 
+	if len(diffIntervals) == 0 {
+		fmt.Println("No go code changes in the diff")
+		core.SetOutput("godiff", fmt.Sprintf("%v", false))
+	}
+
 	covFileBytes, err := os.ReadFile(*coverageFile)
 	if err != nil {
 		log.Fatal(err)
@@ -146,7 +151,7 @@ func main() {
 	fmt.Printf("Coverage on new lines: %d%%\n", percentCoverage)
 	if getActionInput("coverprofile") != "" {
 		core.SetOutput("covdiff", fmt.Sprintf("%d", percentCoverage))
-		core.SetOutput("total", fmt.Sprintf("%d", total))
+		core.SetOutput("godiff", fmt.Sprintf("%v", true))
 		core.SetOutput("missing-lines", missingLinesMessage)
 	}
 }
