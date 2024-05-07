@@ -22,6 +22,9 @@ func ShouldSkipFile(filename string) bool {
 	if strings.Contains(filename, "vendor/") {
 		return true
 	}
+	if strings.Contains(filename, "mocks/") {
+		return true
+	}
 
 	return false
 }
