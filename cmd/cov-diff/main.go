@@ -51,6 +51,27 @@ func populateFlagsFromActionEnvs() {
 	}
 }
 
+func buildMissingMessage(missingLines map[string][]interval.Interval) string {
+	var md strings.Builder
+	md.WriteString("| File | Missing Line Intervals |\n")
+	md.WriteString("|------|------------------------|\n")
+
+	// Fill the table with data from the map
+	for file, intervals := range missingLines {
+		md.WriteString(fmt.Sprintf("| %s |", file))
+		first := true
+		for _, interval := range intervals {
+			if !first {
+				md.WriteString(", ")
+			}
+			md.WriteString(fmt.Sprintf("%d-%d", interval.Start, interval.End))
+			first = false
+		}
+		md.WriteString(" |\n")
+	}
+	return md.String()
+}
+
 func main() {
 	flag.Parse()
 	populateFlagsFromActionEnvs()
@@ -85,6 +106,9 @@ func main() {
 
 	total := 0
 	covered := 0
+
+	missingLines := map[string][]interval.Interval{}
+
 	for filename, di := range diffIntervals {
 		fileBytes, err := os.ReadFile(filepath.Join(*path, filename))
 		if err != nil {
@@ -102,11 +126,14 @@ func main() {
 		fullFilename := filepath.Join(*moduleName, filename)
 		ci, ok := coverIntervals[fullFilename]
 		if !ok {
+			fmt.Println("no coverage data for", fullFilename)
 			continue
 		}
 
 		coveredMeasuredIntervals := interval.Union(measuredIntervals, ci)
 		covered += interval.Sum(coveredMeasuredIntervals)
+
+		missingLines[fullFilename] = interval.SubtractIntervals(measuredIntervals, ci)
 	}
 
 	percentCoverage := 100
@@ -114,8 +141,11 @@ func main() {
 		percentCoverage = (100 * covered) / total
 	}
 
+	missingLinesMessage := buildMissingMessage(missingLines)
+
 	fmt.Printf("Coverage on new lines: %d%%\n", percentCoverage)
 	if getActionInput("coverprofile") != "" {
 		core.SetOutput("covdiff", fmt.Sprintf("%d", percentCoverage))
+		core.SetOutput("missing-lines", missingLinesMessage)
 	}
 }
