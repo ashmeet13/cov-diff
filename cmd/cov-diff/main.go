@@ -127,6 +127,7 @@ func main() {
 		ci, ok := coverIntervals[fullFilename]
 		if !ok {
 			fmt.Println("no coverage data for", fullFilename)
+			missingLines[fullFilename] = measuredIntervals
 			continue
 		}
 
