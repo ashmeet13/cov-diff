@@ -25,6 +25,9 @@ func ShouldSkipFile(filename string) bool {
 	if strings.Contains(filename, "mocks/") {
 		return true
 	}
+	if strings.HasSuffix(filename, ".pb.go") {
+		return true
+	}
 
 	return false
 }
