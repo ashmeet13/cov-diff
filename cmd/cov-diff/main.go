@@ -126,8 +126,9 @@ func main() {
 		fullFilename := filepath.Join(*moduleName, filename)
 		ci, ok := coverIntervals[fullFilename]
 		if !ok {
-			fmt.Println("no coverage data for", fullFilename)
-			missingLines[fullFilename] = measuredIntervals
+			if interval.Sum(measuredIntervals) > 0 {
+				missingLines[fullFilename] = measuredIntervals
+			}
 			continue
 		}
 
