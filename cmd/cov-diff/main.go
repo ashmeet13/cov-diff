@@ -154,8 +154,8 @@ func main() {
 
 	missingLinesMessage := buildMissingMessage(missingLines)
 
-	fmt.Printf("Coverage on new lines: %d%%\n", percentCoverage)
 	if getActionInput("coverprofile") != "" {
+		core.SetOutput("total-lines", fmt.Sprintf("%d", total))
 		core.SetOutput("covdiff", fmt.Sprintf("%d", percentCoverage))
 		core.SetOutput("missing-lines", missingLinesMessage)
 	}
