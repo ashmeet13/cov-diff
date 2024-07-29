@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"regexp"
 	"strings"
 
 	"github.com/panagiotisptr/cov-diff/interval"
@@ -12,7 +13,7 @@ import (
 
 var ErrLineNotFound error = errors.New("line not found")
 
-func ShouldSkipFile(filename string) bool {
+func ShouldSkipFile(filename string, skipFileRegexes []string) bool {
 	if strings.Contains(filename, "_test.go") {
 		return true
 	}
@@ -27,6 +28,12 @@ func ShouldSkipFile(filename string) bool {
 	}
 	if strings.HasSuffix(filename, ".pb.go") {
 		return true
+	}
+
+	for _, r := range skipFileRegexes {
+		if match, _ := regexp.MatchString(r, filename); match {
+			return true
+		}
 	}
 
 	return false

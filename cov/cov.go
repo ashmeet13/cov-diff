@@ -19,7 +19,7 @@ func GetFilesIntervalsFromCoverage(
 	}
 
 	for _, cp := range cps {
-		if files.ShouldSkipFile(cp.FileName) {
+		if files.ShouldSkipFile(cp.FileName, []string{}) {
 			continue
 		}
 

@@ -9,7 +9,7 @@ import (
 )
 
 func GetFilesIntervalsFromDiff(
-	diffBytes []byte,
+	diffBytes []byte, skipFileRegexes []string,
 ) (interval.FilesIntervals, error) {
 	filesIntervals := interval.FilesIntervals{}
 
@@ -22,7 +22,7 @@ func GetFilesIntervalsFromDiff(
 		parts := strings.Split(f.NewName, "/")
 		filename := strings.Join(parts[1:], "/")
 
-		if files.ShouldSkipFile(filename) {
+		if files.ShouldSkipFile(filename, skipFileRegexes) {
 			continue
 		}
 

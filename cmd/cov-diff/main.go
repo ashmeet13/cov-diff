@@ -20,6 +20,7 @@ var coverageFile = flag.String("coverprofile", "", "location of the coverage fil
 var diffFile = flag.String("diff", "", "location of the diff file")
 var moduleName = flag.String("module", "", "the name of module")
 var ignoreMain = flag.String("ignore-main", "", "ignore main package")
+var skipFileRegexesFlag = flag.String("skip-file-regexes", "", "regexes to skip files")
 
 func emptyValAndActionInputSet(val string, input string) bool {
 	return val == "" && os.Getenv(
@@ -48,6 +49,9 @@ func populateFlagsFromActionEnvs() {
 	}
 	if emptyValAndActionInputSet(*ignoreMain, "ignore-main") {
 		*ignoreMain = getActionInput("ignore-main")
+	}
+	if emptyValAndActionInputSet(*skipFileRegexesFlag, "skip-file-regexes") {
+		*skipFileRegexesFlag = getActionInput("skip-file-regexes")
 	}
 }
 
@@ -85,7 +89,12 @@ func main() {
 		log.Fatal("failed to read diff file: ", err)
 	}
 
-	diffIntervals, err := diff.GetFilesIntervalsFromDiff(diffBytes)
+	skipFileRegexes := []string{}
+	if *skipFileRegexesFlag != "" {
+		skipFileRegexes = strings.Split(*skipFileRegexesFlag, ",")
+	}
+
+	diffIntervals, err := diff.GetFilesIntervalsFromDiff(diffBytes, skipFileRegexes)
 	if err != nil {
 		log.Fatal(err)
 	}
