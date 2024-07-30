@@ -14,6 +14,8 @@ inputs:
   ignore-main:
     default: "true"
     description: "ignore main package"
+  skip-file-regexes:
+    required: false
 outputs:
   covdiff:
     description: "the coverage difference (0-100)"
