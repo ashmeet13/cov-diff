@@ -15,6 +15,7 @@ import (
 	"github.com/panagiotisptr/cov-diff/interval"
 )
 
+var cdpath = flag.String("cdpath", "", "path to change directory to")
 var path = flag.String("path", "", "path to the git repository")
 var coverageFile = flag.String("coverprofile", "", "location of the coverage file")
 var diffFile = flag.String("diff", "", "location of the diff file")
@@ -35,6 +36,9 @@ func getActionInput(input string) string {
 }
 
 func populateFlagsFromActionEnvs() {
+	if emptyValAndActionInputSet(*cdpath, "cdpath") {
+		*cdpath = getActionInput("cdpath")
+	}
 	if emptyValAndActionInputSet(*path, "path") {
 		*path = getActionInput("path")
 	}
@@ -79,6 +83,13 @@ func buildMissingMessage(missingLines map[string][]interval.Interval) string {
 func main() {
 	flag.Parse()
 	populateFlagsFromActionEnvs()
+
+	if *cdpath != "" {
+		err := os.Chdir(*cdpath)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	if *coverageFile == "" {
 		log.Fatal("missing coverage file")
